@@ -13,6 +13,7 @@ to generate this file without the comments in this block.
 { name = "deno"
 , dependencies =
   [ "aff"
+  , "aff-promise"
   , "argonaut"
   , "console"
   , "effect"
@@ -20,8 +21,10 @@ to generate this file without the comments in this block.
   , "maybe"
   , "ordered-collections"
   , "prelude"
+  , "strings"
   , "tuples"
   , "unsafe-coerce"
+  , "web-streams"
   ]
 , packages = ./packages.dhall
 , sources = [ "src/**/*.purs", "test/**/*.purs" ]

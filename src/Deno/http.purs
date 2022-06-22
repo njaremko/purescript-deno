@@ -1,6 +1,7 @@
 module Deno.Http where
 
 import Prelude
+import Control.Promise as Promise
 import Data.Argonaut (Json, decodeJson, encodeJson)
 import Data.Either (fromRight)
 import Data.Map (Map)
@@ -8,19 +9,23 @@ import Data.Map as Map
 import Data.Maybe (Maybe(..))
 import Data.Tuple (Tuple(..))
 import Deno (Listener)
+import Deno.Http.Request (Request)
 import Effect (Effect)
 import Effect.Aff (Aff)
 import Effect.Aff.Compat (EffectFnAff, fromEffectFnAff)
 import Unsafe.Coerce (unsafeCoerce)
 
--- | A HTTP request object
-foreign import data Request :: Type
-
 -- | A HTTP response object
 foreign import data Response :: Type
 
 type Handler
-  = Request -> Response
+  = Request -> Aff Response
+
+type Handler'
+  = Request -> Effect (Promise.Promise Response)
+
+mapHandler :: Handler -> Handler'
+mapHandler h = \req -> Promise.fromAff $ h req
 
 -- | A HTTP response object
 foreign import data ServeInit :: Type
@@ -34,9 +39,9 @@ maybeToUndefined Nothing = _undefined
 
 foreign import _undefined :: forall x. Undefined x
 
-foreign import _serveListener :: Listener -> Handler -> Undefined ServeInit -> EffectFnAff Unit
+foreign import _serveListener :: Listener -> Handler' -> Undefined ServeInit -> EffectFnAff Unit
 
-foreign import _serve :: Handler -> Undefined ServeInit -> EffectFnAff Unit
+foreign import _serve :: Handler' -> Undefined ServeInit -> EffectFnAff Unit
 
 foreign import _createResponse :: String -> Undefined Options' -> Response
 
@@ -95,10 +100,10 @@ type DeleteCookieAttributes'
     }
 
 serve :: Handler -> Maybe ServeInit -> Aff Unit
-serve h s = fromEffectFnAff $ _serve h (maybeToUndefined s)
+serve h s = fromEffectFnAff $ _serve (mapHandler h) (maybeToUndefined s)
 
 serveListener :: Listener -> Handler -> Maybe ServeInit -> Aff Unit
-serveListener l h s = fromEffectFnAff $ _serveListener l h (maybeToUndefined s)
+serveListener l h s = fromEffectFnAff $ _serveListener l (mapHandler h) (maybeToUndefined s)
 
 getCookies :: Map String String -> Map String String
 getCookies j = fromRight Map.empty $ decodeJson $ _getCookies (encodeJson j)

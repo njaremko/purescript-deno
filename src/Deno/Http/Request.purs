@@ -26,7 +26,6 @@ import Data.Either (fromRight)
 import Data.Map (Map)
 import Effect (Effect)
 import Effect.Aff (Aff)
-import Effect.Aff.Compat (EffectFnAff, fromEffectFnAff)
 import Web.Streams.ReadableStream (ReadableStream)
 
 -- | A HTTP request object

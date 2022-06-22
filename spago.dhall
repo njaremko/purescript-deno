@@ -28,4 +28,6 @@ to generate this file without the comments in this block.
   ]
 , packages = ./packages.dhall
 , sources = [ "src/**/*.purs", "test/**/*.purs" ]
+, license = "MIT"
+, repository = "https://github.com/njaremko/purescript-deno"
 }

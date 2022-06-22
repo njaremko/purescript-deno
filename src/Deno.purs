@@ -1,4 +1,10 @@
-module Deno where
+module Deno
+  ( ListenOptions
+  , ListenTlsOptions
+  , Listener
+  , listen
+  , listenTls
+  ) where
 
 import Effect (Effect)
 
@@ -13,7 +19,7 @@ type ListenTlsOptions
     , alpnProtocols :: Array String
     }
 
--- | A HTTP response object
+-- | A Deno listener.
 foreign import data Listener :: Type
 
 foreign import _listen :: ListenOptions -> Effect Listener

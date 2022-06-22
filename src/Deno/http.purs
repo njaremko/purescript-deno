@@ -1,4 +1,19 @@
-module Deno.Http where
+module Deno.Http
+  ( Cookie
+  , DeleteCookieAttributes
+  , Handler
+  , Options
+  , Response
+  , ServeInit
+  , createResponse
+  , deleteCookie
+  , getCookies
+  , hContentTypeHtml
+  , hContentTypeJson
+  , serve
+  , serveListener
+  , setCookies
+  ) where
 
 import Prelude
 import Control.Promise as Promise
@@ -13,6 +28,7 @@ import Deno.Http.Request (Request)
 import Effect (Effect)
 import Effect.Aff (Aff)
 import Effect.Aff.Compat (EffectFnAff, fromEffectFnAff)
+import Effect.Unsafe (unsafePerformEffect)
 import Unsafe.Coerce (unsafeCoerce)
 
 -- | A HTTP response object
@@ -22,10 +38,10 @@ type Handler
   = Request -> Aff Response
 
 type Handler'
-  = Request -> Effect (Promise.Promise Response)
+  = Request -> Promise.Promise Response
 
 mapHandler :: Handler -> Handler'
-mapHandler h = \req -> Promise.fromAff $ h req
+mapHandler h = \req -> unsafePerformEffect $ Promise.fromAff $ h req
 
 -- | A HTTP response object
 foreign import data ServeInit :: Type

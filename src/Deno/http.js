@@ -18,7 +18,6 @@ export function _serveListener(listener) {
 
 export function _createResponse(body) {
     return function (options) {
-        console.log(options);
         return new Response(body, options);
     }
 }

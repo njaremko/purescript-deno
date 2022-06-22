@@ -5,6 +5,7 @@ module Deno.Http
   , Options
   , Response
   , ServeInit
+  , Error
   , createResponse
   , deleteCookie
   , getCookies
@@ -21,18 +22,20 @@ import Data.Argonaut (Json, decodeJson, encodeJson)
 import Data.Either (fromRight)
 import Data.Map (Map)
 import Data.Map as Map
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe)
 import Data.Tuple (Tuple(..))
 import Deno (Listener)
 import Deno.Http.Request (Request)
+import Deno.Internal (Undefined, maybeToUndefined)
 import Effect (Effect)
 import Effect.Aff (Aff)
 import Effect.Aff.Compat (EffectFnAff, fromEffectFnAff)
 import Effect.Unsafe (unsafePerformEffect)
-import Unsafe.Coerce (unsafeCoerce)
 
 -- | A HTTP response object
 foreign import data Response :: Type
+
+foreign import data Error :: Type
 
 type Handler
   = Request -> Aff Response
@@ -44,20 +47,26 @@ mapHandler :: Handler -> Handler'
 mapHandler h = \req -> unsafePerformEffect $ Promise.fromAff $ h req
 
 -- | A HTTP response object
-foreign import data ServeInit :: Type
+-- foreign import data ServeInit :: Type
+type ServeInit
+  = { onListen :: Maybe ({ hostname :: String, port :: Int } -> Effect Unit)
+    , onError :: Maybe (Error -> Aff Response)
+    }
 
-foreign import data Undefined :: Type -> Type
+type ServeInit'
+  = { onListen :: Undefined ({ hostname :: String, port :: Int } -> Unit)
+    , onError :: Undefined (Error -> Promise.Promise Response)
+    }
 
-maybeToUndefined :: forall a. Maybe a -> Undefined a
-maybeToUndefined (Just x) = unsafeCoerce x
+mapServeInit :: ServeInit -> ServeInit'
+mapServeInit si =
+  { onListen: maybeToUndefined $ map (\f o -> unsafePerformEffect $ f o) si.onListen
+  , onError: maybeToUndefined $ map (\f i -> unsafePerformEffect $ Promise.fromAff $ f i) si.onError
+  }
 
-maybeToUndefined Nothing = _undefined
+foreign import _serveListener :: Listener -> Handler' -> Undefined ServeInit' -> EffectFnAff Unit
 
-foreign import _undefined :: forall x. Undefined x
-
-foreign import _serveListener :: Listener -> Handler' -> Undefined ServeInit -> EffectFnAff Unit
-
-foreign import _serve :: Handler' -> Undefined ServeInit -> EffectFnAff Unit
+foreign import _serve :: Handler' -> Undefined ServeInit' -> EffectFnAff Unit
 
 foreign import _createResponse :: forall payload. payload -> Undefined Options' -> Response
 
@@ -116,10 +125,10 @@ type DeleteCookieAttributes'
     }
 
 serve :: Handler -> Maybe ServeInit -> Aff Unit
-serve h s = fromEffectFnAff $ _serve (mapHandler h) (maybeToUndefined s)
+serve h s = fromEffectFnAff $ _serve (mapHandler h) (maybeToUndefined $ map mapServeInit s)
 
 serveListener :: Listener -> Handler -> Maybe ServeInit -> Aff Unit
-serveListener l h s = fromEffectFnAff $ _serveListener l (mapHandler h) (maybeToUndefined s)
+serveListener l h s = fromEffectFnAff $ _serveListener l (mapHandler h) (maybeToUndefined $ map mapServeInit s)
 
 getCookies :: Map String String -> Map String String
 getCookies j = fromRight Map.empty $ decodeJson $ _getCookies (encodeJson j)

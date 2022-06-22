@@ -1,6 +1,5 @@
 module Deno.Http.Request where
 
-import Prelude
 import Web.Streams.ReadableStream (ReadableStream)
 
 -- | A HTTP request object

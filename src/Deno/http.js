@@ -40,5 +40,3 @@ export function _deleteCookie(headers) {
         }
     }
 }
-
-export const _undefined = undefined;

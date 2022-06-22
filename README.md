@@ -7,6 +7,7 @@ Implemented:
   - [x] http 
   - [x] dotenv
   - [x] crypto (basic functionality)
+  - [x] fs
 
 
 # Example Deno web server

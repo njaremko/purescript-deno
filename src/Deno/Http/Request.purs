@@ -7,12 +7,14 @@ module Deno.Http.Request
   , destination
   , headers
   , integrity
+  , json
   , method
   , mode
   , priority
   , redirect
   , referrer
   , referrerPolicy
+  , text
   , url
   ) where
 
@@ -20,6 +22,8 @@ import Prelude
 import Data.Argonaut (Json, decodeJson)
 import Data.Either (fromRight)
 import Data.Map (Map)
+import Effect.Aff (Aff)
+import Effect.Aff.Compat (EffectFnAff, fromEffectFnAff)
 import Web.Streams.ReadableStream (ReadableStream)
 
 -- | A HTTP request object
@@ -55,3 +59,13 @@ foreign import referrer :: Request -> String
 foreign import referrerPolicy :: Request -> String
 
 foreign import url :: Request -> String
+
+foreign import _json :: Request -> EffectFnAff Json
+
+json :: Request -> Aff Json
+json req = fromEffectFnAff $ _json req
+
+foreign import _text :: Request -> EffectFnAff String
+
+text :: Request -> Aff String
+text req = fromEffectFnAff $ _text req

@@ -50,3 +50,11 @@ export function referrerPolicy(req) {
 export function url(req) {
     return req.url;
 }
+
+export function _json(req) {
+    return () => req.json();
+}
+
+export function _text(req) {
+    return () => req.text();
+}

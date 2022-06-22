@@ -3,15 +3,17 @@ module Main
   ) where
 
 import Prelude
+
+import Data.Argonaut (stringify)
 import Data.Map as Map
 import Data.Maybe (Maybe(..))
 import Data.String (Replacement(..), Pattern(..), replace)
 import Deno as Deno
-import Deno.Http (Response, Handler, createResponse, hContentTypeHtml, serveListener)
+import Deno.Http (Handler, Response, createResponse, hContentTypeHtml, hContentTypeJson, serveListener)
+import Deno.Http.Request (Request)
 import Deno.Http.Request as Request
 import Effect (Effect)
-import Effect.Aff (launchAff_)
-import Effect.Class (liftEffect)
+import Effect.Aff (Aff, launchAff_)
 import Effect.Console (log)
 
 main :: Effect Unit
@@ -23,16 +25,12 @@ main = do
 handler :: Handler
 handler req =
   let
-    replacer = replace (Pattern "http://localhost:3001") (Replacement "")
+    path = replace (Pattern "http://localhost:3001") (Replacement "") $ Request.url req
   in
-    liftEffect
-      $ pure
-      $ router
-      $ replacer
-      $ Request.url req
+    router path req
 
-router :: String -> Response
-router "/" =
+router :: String -> Request -> Aff Response
+router "/" _ =
   let
     payload =
       """
@@ -50,6 +48,14 @@ router "/" =
 
     response_options = Just { headers, status: Nothing, statusText: Nothing }
   in
-    createResponse payload response_options
+    pure $ createResponse payload response_options
 
-router _ = createResponse "Fallthrough!" Nothing
+router "/example-api" req = do
+  payload <- Request.json req
+  let
+    headers = Just $ Map.fromFoldable [ hContentTypeJson ]
+
+    response_options = Just { headers, status: Nothing, statusText: Nothing }
+  pure $ createResponse (stringify payload) response_options
+
+router _ _ = pure $ createResponse "Fallthrough!" Nothing

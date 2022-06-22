@@ -19,9 +19,12 @@ module Deno.Http.Request
   ) where
 
 import Prelude
+import Control.Promise (Promise)
+import Control.Promise as Promise
 import Data.Argonaut (Json, decodeJson)
 import Data.Either (fromRight)
 import Data.Map (Map)
+import Effect (Effect)
 import Effect.Aff (Aff)
 import Effect.Aff.Compat (EffectFnAff, fromEffectFnAff)
 import Web.Streams.ReadableStream (ReadableStream)
@@ -60,12 +63,12 @@ foreign import referrerPolicy :: Request -> String
 
 foreign import url :: Request -> String
 
-foreign import _json :: Request -> EffectFnAff Json
+foreign import _json :: Request -> Effect (Promise Json)
 
 json :: Request -> Aff Json
-json req = fromEffectFnAff $ _json req
+json req = Promise.toAffE $ _json req
 
-foreign import _text :: Request -> EffectFnAff String
+foreign import _text :: Request -> Effect (Promise String)
 
 text :: Request -> Aff String
-text req = fromEffectFnAff $ _text req
+text req = Promise.toAffE $ _text req

@@ -2,14 +2,23 @@
 
 import * as server from "https://deno.land/std@0.144.0/http/server.ts";
 
-export function _serve(request) {
+export function _serve(handler) {
     return function (serveInit) {
-        return () => server.serve(request, serveInit);
+        return () => server.serve(handler, serveInit);
+    }
+}
+
+export function _serveListener(listener) {
+    return function (handler) {
+        return function (serveInit) {
+            return () => server.serveListener(listener, handler, serveInit);
+        }
     }
 }
 
 export function _createResponse(body) {
     return function (options) {
+        console.log(options);
         return new Response(body, options);
     }
 }
@@ -32,3 +41,5 @@ export function _deleteCookie(headers) {
         }
     }
 }
+
+export const _undefined = undefined;

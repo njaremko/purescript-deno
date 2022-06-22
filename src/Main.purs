@@ -5,7 +5,8 @@ import Data.Argonaut (encodeJson, stringify)
 import Data.Map as Map
 import Data.Maybe (Maybe(..))
 import Data.Tuple (Tuple(..))
-import Deno.Http (createResponse, serve)
+import Deno as Deno
+import Deno.Http (createResponse, hContentTypeHtml, hContentTypeJson, serveListener)
 import Effect (Effect)
 import Effect.Aff (launchAff_)
 import Effect.Console (log)
@@ -18,7 +19,10 @@ main :: Effect Unit
 main = do
   log "🍝"
   let
-    payload = { error: "🍝" }
-  let
-    headers = Map.fromFoldable [ Tuple "content-type" "application/json" ]
-  launchAff_ $ serve (\_req -> createResponse (stringify $ encodeJson payload) (Just { headers: Just headers, status: Nothing, statusText: Nothing })) Nothing
+    payload = "<html><head></head><body><div>Hello World!</div></body></html>"
+
+    headers = Just $ Map.fromFoldable [ hContentTypeJson ]
+
+    response_options = Just { headers, status: Nothing, statusText: Nothing }
+  listener <- Deno.listen { port: 3001 }
+  launchAff_ $ serveListener listener (\_req -> createResponse payload response_options) Nothing

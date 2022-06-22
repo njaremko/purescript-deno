@@ -4,8 +4,14 @@ module Deno
   , Listener
   , listen
   , listenTls
+  , env
   ) where
 
+import Prelude
+import Data.Argonaut (Json, decodeJson)
+import Data.Either (fromRight)
+import Data.Function.Uncurried (Fn0, runFn0)
+import Data.Map (Map)
 import Effect (Effect)
 
 type ListenOptions
@@ -25,6 +31,11 @@ foreign import data Listener :: Type
 foreign import _listen :: ListenOptions -> Effect Listener
 
 foreign import _listenTls :: ListenTlsOptions -> Effect Listener
+
+foreign import _env :: Fn0 Json
+
+env :: Map String String
+env = fromRight mempty $ decodeJson $ runFn0 _env
 
 listen :: ListenOptions -> Effect Listener
 listen options = _listen options

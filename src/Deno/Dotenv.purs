@@ -1,12 +1,19 @@
 module Deno.Dotenv
   ( ConfigOptions
   , config
+  , configSync
   ) where
 
 import Prelude
+import Control.Promise (Promise)
+import Control.Promise as Promise
+import Data.Argonaut (Json, decodeJson)
+import Data.Either (fromRight)
+import Data.Map (Map)
 import Data.Maybe (Maybe)
 import Deno.Internal (Undefined, maybeToUndefined)
 import Effect (Effect)
+import Effect.Aff (Aff)
 
 type ConfigOptions
   = { path :: Maybe String -- | Optional path to .env file. Defaults to ./.env. 
@@ -26,10 +33,29 @@ type ConfigOptions'
     , defaults :: Undefined String
     }
 
-foreign import _config :: Undefined ConfigOptions' -> Effect Unit
+foreign import _config :: Undefined ConfigOptions' -> Effect (Promise Json)
 
-config :: Maybe ConfigOptions -> Effect Unit
-config options = _config $ maybeToUndefined $ map toIntern options
+config :: Maybe ConfigOptions -> Aff (Map String String)
+config options = do
+  val <- Promise.toAffE $ _config $ maybeToUndefined $ map toIntern options
+  pure $ fromRight mempty $ decodeJson val
+  where
+  toIntern :: ConfigOptions -> ConfigOptions'
+  toIntern o =
+    { path: maybeToUndefined $ o.path
+    , export: maybeToUndefined $ o.export
+    , safe: maybeToUndefined $ o.safe
+    , example: maybeToUndefined $ o.example
+    , allowEmptyValues: maybeToUndefined $ o.allowEmptyValues
+    , defaults: maybeToUndefined $ o.defaults
+    }
+
+foreign import _configSync :: Undefined ConfigOptions' -> Effect Json
+
+configSync :: Maybe ConfigOptions -> Effect (Map String String)
+configSync options = do
+  val <- _configSync $ maybeToUndefined $ map toIntern options
+  pure $ fromRight mempty $ decodeJson val
   where
   toIntern :: ConfigOptions -> ConfigOptions'
   toIntern o =

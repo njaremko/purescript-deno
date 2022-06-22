@@ -6,6 +6,7 @@ Implemented:
 - [ ] [Std](https://deno.land/std@0.144.0)
   - [x] http 
   - [x] dotenv
+  - [x] crypto (basic functionality)
 
 
 # Example Deno web server

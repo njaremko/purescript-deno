@@ -15,6 +15,8 @@ to generate this file without the comments in this block.
   [ "aff"
   , "aff-promise"
   , "argonaut"
+  , "arraybuffer"
+  , "arraybuffer-types"
   , "console"
   , "effect"
   , "either"

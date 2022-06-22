@@ -8,12 +8,14 @@ import Data.Map as Map
 import Data.Maybe (Maybe(..), fromMaybe)
 import Data.String (Replacement(..), Pattern(..), replace)
 import Deno as Deno
+import Deno.Crypto as Crypto
 import Deno.Dotenv as Dotenv
 import Deno.Http (Handler, Response, createResponse, hContentTypeHtml, hContentTypeJson, serveListener)
 import Deno.Http.Request (Request)
 import Deno.Http.Request as Request
 import Effect (Effect)
 import Effect.Aff (Aff, launchAff_)
+import Effect.Class (liftEffect)
 import Effect.Console (log)
 
 main :: Effect Unit
@@ -33,7 +35,10 @@ main = do
 
     handler = makeHandler url
   listener <- Deno.listen { port: 3001 }
-  launchAff_ $ serveListener listener handler Nothing
+  launchAff_
+    $ do
+        liftEffect $ log "Listening on port 3001"
+        serveListener listener handler Nothing
 
 makeHandler :: String -> Handler
 makeHandler baseUrl req =

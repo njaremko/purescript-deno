@@ -1,6 +1,5 @@
 module Main
-  ( Resp
-  , main
+  ( main
   ) where
 
 import Prelude
@@ -8,38 +7,44 @@ import Data.Map as Map
 import Data.Maybe (Maybe(..))
 import Data.String (Replacement(..), Pattern(..), replace)
 import Deno as Deno
-import Deno.Http (Response, createResponse, hContentTypeHtml, serveListener)
+import Deno.Http (Response, Handler, createResponse, hContentTypeHtml, serveListener)
 import Deno.Http.Request as Request
 import Effect (Effect)
 import Effect.Aff (launchAff_)
 import Effect.Class (liftEffect)
 import Effect.Console (log)
 
-type Resp
-  = { error :: String
-    }
-
 main :: Effect Unit
 main = do
-  log "🍝"
+  log "Let's get cookin 🍝"
   listener <- Deno.listen { port: 3001 }
+  launchAff_ $ serveListener listener handler Nothing
+
+handler :: Handler
+handler req =
   let
     replacer = replace (Pattern "http://localhost:3001") (Replacement "")
-  launchAff_
-    $ serveListener listener
-        ( \req ->
-            liftEffect
-              $ pure
-              $ router
-              $ replacer
-              $ Request.url req
-        )
-        Nothing
+  in
+    liftEffect
+      $ pure
+      $ router
+      $ replacer
+      $ Request.url req
 
 router :: String -> Response
 router "/" =
   let
-    payload = "<html><head></head><body><div>Hello World!</div></body></html>"
+    payload =
+      """
+    <html>
+      <head></head>
+      <body>
+        <div>
+          Hello World!
+        </div>
+      </body>
+    </html>
+    """
 
     headers = Just $ Map.fromFoldable [ hContentTypeHtml ]
 

@@ -59,7 +59,7 @@ foreign import _serveListener :: Listener -> Handler' -> Undefined ServeInit -> 
 
 foreign import _serve :: Handler' -> Undefined ServeInit -> EffectFnAff Unit
 
-foreign import _createResponse :: String -> Undefined Options' -> Response
+foreign import _createResponse :: forall payload. payload -> Undefined Options' -> Response
 
 foreign import _getCookies :: Json -> Json
 
@@ -150,7 +150,7 @@ deleteCookie headers name attrs = _deleteCookie (encodeJson headers) name (maybe
     , domain: maybeToUndefined $ cookieAttrs.domain
     }
 
-createResponse :: String -> Maybe Options -> Response
+createResponse :: forall payload. payload -> Maybe Options -> Response
 createResponse body o = _createResponse body (maybeToUndefined (map toIntern o))
   where
   toIntern :: Options -> Options'

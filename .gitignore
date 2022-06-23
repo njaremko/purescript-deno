@@ -10,4 +10,4 @@
 /.psa*
 /.spago
 .env
-/src/Main.purs
+/src/Main.purs*

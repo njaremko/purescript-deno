@@ -44,7 +44,7 @@ type Handler'
   = Request -> Promise.Promise Response
 
 mapHandler :: Handler -> Handler'
-mapHandler h = \req -> unsafePerformEffect $ Promise.fromAff $ h req
+mapHandler h = \req -> unsafePerformEffect <<< Promise.fromAff $ h req
 
 -- | A HTTP response object
 -- foreign import data ServeInit :: Type
@@ -61,7 +61,7 @@ type ServeInit'
 mapServeInit :: ServeInit -> ServeInit'
 mapServeInit si =
   { onListen: maybeToUndefined $ map (\f o -> unsafePerformEffect $ f o) si.onListen
-  , onError: maybeToUndefined $ map (\f i -> unsafePerformEffect $ Promise.fromAff $ f i) si.onError
+  , onError: maybeToUndefined $ map (\f i -> unsafePerformEffect <<< Promise.fromAff $ f i) si.onError
   }
 
 foreign import _serveListener :: Listener -> Handler' -> Undefined ServeInit' -> EffectFnAff Unit
@@ -131,22 +131,22 @@ serveListener :: Listener -> Handler -> Maybe ServeInit -> Aff Unit
 serveListener l h s = fromEffectFnAff $ _serveListener l (mapHandler h) (maybeToUndefined $ map mapServeInit s)
 
 getCookies :: Map String String -> Map String String
-getCookies j = fromRight Map.empty $ decodeJson $ _getCookies (encodeJson j)
+getCookies j = fromRight Map.empty <<< decodeJson $ _getCookies (encodeJson j)
 
 setCookies :: Map String String -> Cookie -> Effect Unit
 setCookies j c = _setCookies (encodeJson j) (toIntern c)
   where
   toIntern :: Cookie -> Cookie'
   toIntern cookie =
-    { domain: maybeToUndefined $ cookie.domain
-    , expires: maybeToUndefined $ cookie.expires
-    , httpOnly: maybeToUndefined $ cookie.httpOnly
-    , maxAge: maybeToUndefined $ cookie.maxAge
+    { domain: maybeToUndefined cookie.domain
+    , expires: maybeToUndefined cookie.expires
+    , httpOnly: maybeToUndefined cookie.httpOnly
+    , maxAge: maybeToUndefined cookie.maxAge
     , name: cookie.name
-    , path: maybeToUndefined $ cookie.path
-    , sameSite: maybeToUndefined $ cookie.sameSite
-    , secure: maybeToUndefined $ cookie.secure
-    , unparsed: maybeToUndefined $ cookie.unparsed
+    , path: maybeToUndefined cookie.path
+    , sameSite: maybeToUndefined cookie.sameSite
+    , secure: maybeToUndefined cookie.secure
+    , unparsed: maybeToUndefined cookie.unparsed
     , value: cookie.value
     }
 
@@ -155,8 +155,8 @@ deleteCookie headers name attrs = _deleteCookie (encodeJson headers) name (maybe
   where
   toIntern :: DeleteCookieAttributes -> DeleteCookieAttributes'
   toIntern cookieAttrs =
-    { path: maybeToUndefined $ cookieAttrs.path
-    , domain: maybeToUndefined $ cookieAttrs.domain
+    { path: maybeToUndefined cookieAttrs.path
+    , domain: maybeToUndefined cookieAttrs.domain
     }
 
 createResponse :: forall payload. payload -> Maybe Options -> Response
@@ -165,8 +165,8 @@ createResponse body o = _createResponse body (maybeToUndefined (map toIntern o))
   toIntern :: Options -> Options'
   toIntern opts =
     { headers: maybeToUndefined $ map encodeJson opts.headers
-    , status: maybeToUndefined $ opts.status
-    , statusText: maybeToUndefined $ opts.statusText
+    , status: maybeToUndefined opts.status
+    , statusText: maybeToUndefined opts.statusText
     }
 
 hContentTypeJson :: Tuple String String

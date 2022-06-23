@@ -37,32 +37,32 @@ foreign import _config :: Undefined ConfigOptions' -> Effect (Promise Json)
 
 config :: Maybe ConfigOptions -> Aff (Map String String)
 config options = do
-  val <- Promise.toAffE $ _config $ maybeToUndefined $ map toIntern options
+  val <- Promise.toAffE <<< _config <<< maybeToUndefined $ map toIntern options
   pure $ fromRight mempty $ decodeJson val
   where
   toIntern :: ConfigOptions -> ConfigOptions'
   toIntern o =
-    { path: maybeToUndefined $ o.path
-    , export: maybeToUndefined $ o.export
-    , safe: maybeToUndefined $ o.safe
-    , example: maybeToUndefined $ o.example
-    , allowEmptyValues: maybeToUndefined $ o.allowEmptyValues
-    , defaults: maybeToUndefined $ o.defaults
+    { path: maybeToUndefined o.path
+    , export: maybeToUndefined o.export
+    , safe: maybeToUndefined o.safe
+    , example: maybeToUndefined o.example
+    , allowEmptyValues: maybeToUndefined o.allowEmptyValues
+    , defaults: maybeToUndefined o.defaults
     }
 
 foreign import _configSync :: Undefined ConfigOptions' -> Effect Json
 
 configSync :: Maybe ConfigOptions -> Effect (Map String String)
 configSync options = do
-  val <- _configSync $ maybeToUndefined $ map toIntern options
-  pure $ fromRight mempty $ decodeJson val
+  val <- _configSync <<< maybeToUndefined $ map toIntern options
+  pure <<< fromRight mempty $ decodeJson val
   where
   toIntern :: ConfigOptions -> ConfigOptions'
   toIntern o =
-    { path: maybeToUndefined $ o.path
-    , export: maybeToUndefined $ o.export
-    , safe: maybeToUndefined $ o.safe
-    , example: maybeToUndefined $ o.example
-    , allowEmptyValues: maybeToUndefined $ o.allowEmptyValues
-    , defaults: maybeToUndefined $ o.defaults
+    { path: maybeToUndefined o.path
+    , export: maybeToUndefined o.export
+    , safe: maybeToUndefined o.safe
+    , example: maybeToUndefined o.example
+    , allowEmptyValues: maybeToUndefined o.allowEmptyValues
+    , defaults: maybeToUndefined o.defaults
     }

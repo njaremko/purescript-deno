@@ -35,7 +35,7 @@ foreign import _listenTls :: ListenTlsOptions -> Effect Listener
 foreign import _env :: Fn0 Json
 
 env :: Map String String
-env = fromRight mempty $ decodeJson $ runFn0 _env
+env = fromRight mempty <<< decodeJson $ runFn0 _env
 
 listen :: ListenOptions -> Effect Listener
 listen options = _listen options

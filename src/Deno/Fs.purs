@@ -31,8 +31,8 @@ copy src dest opts = Promise.toAffE $ _copy src dest (maybeToUndefined $ map toI
   where
   toIntern :: CopyOptions -> CopyOptions'
   toIntern o =
-    { overwrite: maybeToUndefined $ o.overwrite
-    , preserveTimestamps: maybeToUndefined $ o.preserveTimestamps
+    { overwrite: maybeToUndefined o.overwrite
+    , preserveTimestamps: maybeToUndefined o.preserveTimestamps
     }
 
 foreign import _copySync :: String -> String -> Undefined CopyOptions' -> Effect Unit
@@ -42,8 +42,8 @@ copySync src dest opts = _copySync src dest (maybeToUndefined $ map toIntern opt
   where
   toIntern :: CopyOptions -> CopyOptions'
   toIntern o =
-    { overwrite: maybeToUndefined $ o.overwrite
-    , preserveTimestamps: maybeToUndefined $ o.preserveTimestamps
+    { overwrite: maybeToUndefined o.overwrite
+    , preserveTimestamps: maybeToUndefined o.preserveTimestamps
     }
 
 type MoveOptions
@@ -61,7 +61,7 @@ move src dest opts = Promise.toAffE $ _move src dest (maybeToUndefined $ map toI
   where
   toIntern :: MoveOptions -> MoveOptions'
   toIntern o =
-    { overwrite: maybeToUndefined $ o.overwrite
+    { overwrite: maybeToUndefined o.overwrite
     }
 
 foreign import _moveSync :: String -> String -> Undefined MoveOptions' -> Effect Unit
@@ -71,5 +71,5 @@ moveSync src dest opts = _moveSync src dest (maybeToUndefined $ map toIntern opt
   where
   toIntern :: MoveOptions -> MoveOptions'
   toIntern o =
-    { overwrite: maybeToUndefined $ o.overwrite
+    { overwrite: maybeToUndefined o.overwrite
     }

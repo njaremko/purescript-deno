@@ -44,7 +44,7 @@ foreign import destination :: Request -> String
 foreign import _headers :: Request -> Json
 
 headers :: Request -> Map String String
-headers req = fromRight mempty $ decodeJson $ _headers req
+headers req = fromRight mempty <<< decodeJson $ _headers req
 
 foreign import integrity :: Request -> String
 

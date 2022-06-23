@@ -4,11 +4,12 @@ Deno bindings for Purescript
 
 Implemented:
 - [ ] [Std](https://deno.land/std@0.144.0)
-  - [x] http 
-  - [x] dotenv
   - [x] crypto (basic functionality)
-  - [x] fs
   - [x] datetime
+  - [x] dotenv
+  - [x] fs
+  - [x] http 
+  - [x] log
   - [x] uuid
 
 

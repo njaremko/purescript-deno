@@ -103,7 +103,7 @@ foreign import _difference :: Date -> Date -> Undefined DifferenceOptions' -> Ar
 difference :: Date -> Date -> Maybe DifferenceOptions -> Map DifferenceUnit Int
 difference from to opts =
   Map.fromFoldable
-    $ Array.mapMaybe (\(Tuple k v) -> map (\parsedKey -> Tuple parsedKey v) $ parseDifferenceUnit k)
+    <<< Array.mapMaybe (\(Tuple k v) -> map (\parsedKey -> Tuple parsedKey v) $ parseDifferenceUnit k)
     $ _difference from to (maybeToUndefined (map toInternalDifferenceOptions opts))
   where
   toInternalDifferenceOptions :: DifferenceOptions -> DifferenceOptions'

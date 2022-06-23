@@ -8,6 +8,7 @@ Implemented:
   - [x] dotenv
   - [x] crypto (basic functionality)
   - [x] fs
+  - [x] datetime
 
 
 # Example Deno web server

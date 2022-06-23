@@ -1,4 +1,3 @@
-
 export function body(req) {
     return req.body;
 }

@@ -22,4 +22,5 @@ validate x = if _validate x then Just $ unsafeCoerce x else Nothing
 -- | Detect RFC version of a UUID.
 foreign import version :: UUID -> Int
 
+-- | "00000000-0000-0000-0000-000000000000"
 foreign import nil_uuid :: UUID

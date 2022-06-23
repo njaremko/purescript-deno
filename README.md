@@ -9,6 +9,7 @@ Implemented:
   - [x] crypto (basic functionality)
   - [x] fs
   - [x] datetime
+  - [x] uuid
 
 
 # Example Deno web server

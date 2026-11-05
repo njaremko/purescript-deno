@@ -11,3 +11,4 @@
 /.spago
 .env
 /src/Main.purs*
+/spago.lock

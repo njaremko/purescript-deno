@@ -25,5 +25,5 @@ package:
   test:
     main: Test.Main
     dependencies:
-      - console: ">=6.0.0 <7.0.0"
+      - assert: ">=6.0.0 <7.0.0"
 workspace: {}
